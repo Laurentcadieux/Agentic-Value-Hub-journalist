@@ -42,6 +42,7 @@ export interface AiProvider {
 export interface OpenAIProviderOptions {
   apiKey?: string;
   model?: string;
+  baseURL?: string;
   logger?: Logger;
 }
 
@@ -53,7 +54,8 @@ export class OpenAIProvider implements AiProvider {
   constructor(options: OpenAIProviderOptions = {}) {
     const apiKey = options.apiKey ?? process.env.AI_API_KEY;
     if (!apiKey) throw new Error('OpenAIProvider: AI_API_KEY is required');
-    this.client = new OpenAI({ apiKey });
+    const baseURL = options.baseURL ?? process.env.AI_BASE_URL;
+    this.client = new OpenAI({ apiKey, ...(baseURL ? { baseURL } : {}) });
     this.model = options.model ?? process.env.AI_MODEL ?? 'gpt-4o-mini';
     this.log = options.logger ?? new Logger('ai-provider');
   }
@@ -150,6 +152,12 @@ export function createAiProvider(logger?: Logger): AiProvider {
   switch (provider) {
     case 'openai':
       return new OpenAIProvider({ logger });
+    case 'openrouter':
+      return new OpenAIProvider({
+        logger,
+        baseURL: 'https://openrouter.ai/api/v1',
+        model: process.env.AI_MODEL ?? 'openai/gpt-4o-mini',
+      });
     default:
       throw new Error(`Unknown AI provider: ${provider}`);
   }
