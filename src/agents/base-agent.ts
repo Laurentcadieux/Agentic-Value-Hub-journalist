@@ -6,6 +6,7 @@
  * article never kills the whole run.
  */
 import { Logger } from '../lib/logger.js';
+import { formatArticlePrompt } from '../lib/format-guide.js';
 import { ingestForAgent } from '../pipeline/ingest.js';
 import { processArticles } from '../pipeline/process.js';
 import { illustrateArticles } from '../pipeline/illustrate.js';
@@ -42,6 +43,16 @@ export class BaseJournalist {
   }
 
   /**
+   * The system prompt this agent uses to generate articles, built from
+   * the shared format guide so every agent writes to the same editorial
+   * standard (ethics + format + beat context). The prompt lives in
+   * `format-guide.ts`, not inlined here.
+   */
+  getSystemPrompt(): string {
+    return formatArticlePrompt(this.config.beat);
+  }
+
+  /**
    * Run the full pipeline for this agent.
    */
   async run(options: BaseAgentRunOptions = {}): Promise<BaseAgentRunResult> {
@@ -70,7 +81,10 @@ export class BaseJournalist {
     // 2. Process — AI summarization + entity extraction.
     let processed;
     try {
-      processed = await processArticles(raws, this.config, { logger: this.log });
+      processed = await processArticles(raws, this.config, {
+        logger: this.log,
+        systemPrompt: this.getSystemPrompt(),
+      });
     } catch (err) {
       this.log.error('process stage failed', { error: err instanceof Error ? err.message : String(err) });
       return { ingested: raws.length, processed: 0, illustrated: 0, published: 0, duplicate: 0, failed: 0 };

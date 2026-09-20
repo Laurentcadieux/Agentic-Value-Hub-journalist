@@ -11,6 +11,7 @@
 import OpenAI from 'openai';
 import type { LogLevel } from '../types.js';
 import { Logger } from './logger.js';
+import { formatArticlePrompt, formatFixPrompt } from './format-guide.js';
 
 /** Result of an `analyze` call: the AI's structured take on an article. */
 export interface AnalyzeResult {
@@ -34,9 +35,34 @@ export interface AiProvider {
     title: string,
     content: string,
     defaults: { categories: string[]; tags: string[]; beat: string },
+    options?: AnalyzeOptions,
+  ): Promise<AnalyzeResult>;
+  /**
+   * Re-prompt the model to fix an article that failed ethics / format
+   * validation. `draft` is the previous AnalyzeResult and `violations`
+   * are the messages returned by `validateEthics`. Returns a corrected
+   * AnalyzeResult (or the same shape) — it does NOT guarantee the
+   * violations are gone; the caller re-validates.
+   */
+  fixArticle(
+    title: string,
+    content: string,
+    defaults: { categories: string[]; tags: string[]; beat: string },
+    draft: AnalyzeResult,
+    violations: string[],
   ): Promise<AnalyzeResult>;
   /** Classify an article into categories + tags. */
   classify(title: string, content: string, candidates: string[]): Promise<{ categories: string[]; tags: string[] }>;
+}
+
+/** Optional knobs for `analyze`. */
+export interface AnalyzeOptions {
+  /**
+   * Override the system prompt. When omitted, the provider builds it
+   * from `formatArticlePrompt(defaults.beat)` so the beat-specific
+   * editorial standards are applied automatically.
+   */
+  systemPrompt?: string;
 }
 
 export interface OpenAIProviderOptions {
@@ -85,21 +111,46 @@ export class OpenAIProvider implements AiProvider {
     title: string,
     content: string,
     defaults: { categories: string[]; tags: string[]; beat: string },
+    options: AnalyzeOptions = {},
   ): Promise<AnalyzeResult> {
-    const system =
-      'You are an enterprise-AI journalist. Read the article and return ONLY a JSON object with these exact keys: ' +
-      'headline, summary, analysis, why_it_matters, categories, tags, companies, industries, business_functions, technologies. ' +
-      'Rules: write an ORIGINAL headline and 2-3 paragraph summary (never copy from the source). ' +
-      '`analysis` explains business implications for enterprise automation leaders. ' +
-      '`why_it_matters` is 1-2 sentences on why this matters now. ' +
-      'categories/tags are short lowercase strings. companies/industries/business_functions/technologies are arrays of proper nouns or canonical names (empty array if none). ' +
-      'Prefer the provided default categories/tags where they fit. Respond with JSON only, no prose.';
+    // System prompt is sourced from the shared format guide so every
+    // agent writes to the same editorial standard (ethics + format +
+    // beat context). Callers may override via options.systemPrompt.
+    const system = options.systemPrompt ?? formatArticlePrompt(defaults.beat);
     const user = `BEAT: ${defaults.beat}\nDEFAULT CATEGORIES: ${JSON.stringify(defaults.categories)}\nDEFAULT TAGS: ${JSON.stringify(defaults.tags)}\n\nTITLE: ${title}\n\nCONTENT:\n${content.slice(0, 8000)}`;
     const raw = await this.chat(system, user, true);
+    return this.parseAnalyze(raw, defaults, title);
+  }
+
+  async fixArticle(
+    title: string,
+    content: string,
+    defaults: { categories: string[]; tags: string[]; beat: string },
+    draft: AnalyzeResult,
+    violations: string[],
+  ): Promise<AnalyzeResult> {
+    if (violations.length === 0) return draft;
+    const system = formatFixPrompt(defaults.beat, violations);
+    const user =
+      `BEAT: ${defaults.beat}\n` +
+      `DEFAULT CATEGORIES: ${JSON.stringify(defaults.categories)}\n` +
+      `DEFAULT TAGS: ${JSON.stringify(defaults.tags)}\n\n` +
+      `TITLE: ${title}\n\nCONTENT:\n${content.slice(0, 8000)}\n\n` +
+      `PREVIOUS DRAFT (JSON):\n${JSON.stringify(draft)}`;
+    const raw = await this.chat(system, user, true);
+    return this.parseAnalyze(raw, defaults, title);
+  }
+
+  /** Parse an LLM JSON response into a normalized AnalyzeResult. */
+  private parseAnalyze(
+    raw: string,
+    defaults: { categories: string[]; tags: string[] },
+    fallbackTitle: string,
+  ): AnalyzeResult {
     try {
       const parsed = JSON.parse(raw) as AnalyzeResult;
       return {
-        headline: String(parsed.headline ?? title),
+        headline: String(parsed.headline ?? fallbackTitle),
         summary: String(parsed.summary ?? ''),
         analysis: String(parsed.analysis ?? ''),
         why_it_matters: String(parsed.why_it_matters ?? ''),
@@ -114,7 +165,7 @@ export class OpenAIProvider implements AiProvider {
       this.log.error('analyze: failed to parse JSON', { error: err instanceof Error ? err.message : String(err), raw });
       // Fallback: minimal result so the pipeline can continue.
       return {
-        headline: title,
+        headline: fallbackTitle,
         summary: '',
         analysis: '',
         why_it_matters: '',

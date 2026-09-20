@@ -109,6 +109,84 @@ Each agent produces:
 }
 ```
 
+## Editorial Standards
+
+Every article produced by every one of the 15 journalists is held to the
+same editorial standard, enforced by the shared format guide
+(`src/lib/format-guide.ts`) and the ethics validator
+(`src/lib/ethics.ts`).
+
+### Ethical guidelines
+
+All 15 agents follow these 10 rules, embedded in the AI system prompt and
+checked at process time:
+
+1. **Never copy source text verbatim** — always rewrite in original prose.
+2. **Always include the `source_url`** so readers can verify the original.
+3. **Never fabricate quotes, statistics, or facts.**
+4. **Clearly label assumptions, estimates, and uncertain data** as such.
+5. **No clickbait headlines** — headlines must be factual and clear.
+6. **No fear-mongering** or sensationalized alarmist language.
+7. **Respect copyright** — summarize and analyze, never reproduce protected text.
+8. **Disclose that the article is AI-generated / AI-assisted.**
+9. **No fake news** — every claim must trace back to the cited source.
+10. **Maintain a neutral, professional tone**; avoid editorializing or hype.
+
+After AI processing, each article is run through `validateEthics()`. If it
+violates the rules, the model is re-prompted once with the specific
+violations. If it still fails, the article is **skipped and logged** — a
+bad article never reaches publication.
+
+### Article format
+
+Every article follows this exact structure with hard character limits:
+
+| Field          | Length              | Contents                                                                 |
+|----------------|---------------------|--------------------------------------------------------------------------|
+| `headline`     | max 120 chars       | Clear, factual, no clickbait.                                            |
+| `summary`      | max 500 chars total | 2-3 short paragraphs. What happened, then why it matters.                |
+| `analysis`     | max 1000 chars      | 1-2 paragraphs on business implications for enterprise automation leaders. |
+| `why_it_matters` | max 300 chars     | 1-2 sentences. A concrete takeaway, not vague.                           |
+
+The article keeps it **short yet meaningful** — no filler, no fluff, every
+sentence adds value.
+
+### The Problem-Use-Outcome principle
+
+The `summary` must implicitly answer three questions:
+
+- **What problem exists?** — the pain point or gap the news addresses.
+- **What is the use case?** — who would use this and for what.
+- **What is the tangible outcome?** — the concrete result or change it
+  enables.
+
+This keeps summaries grounded in real-world value rather than abstract
+description.
+
+The `why_it_matters` field enforces a complementary rule — it must answer
+**"What should an enterprise leader DO with this information?"** — so every
+article ends on an actionable takeaway.
+
+### Readability rules
+
+Applied to every field of every article:
+
+- Short sentences (aim for ≤ 25 words); vary length for rhythm.
+- Active voice, not passive ("X launched Y", not "Y was launched by X").
+- No unexplained jargon — define or paraphrase specialist terms on first use.
+- End with an actionable takeaway the reader can act on.
+- One idea per paragraph. No walls of text.
+- Plain English. No marketing language, no hype words, no buzzword salad.
+
+### AI disclosure policy
+
+All content in this pipeline is **AI-generated / AI-assisted**. Articles
+are written by an LLM from source material and reviewed by the automated
+ethics + format validation described above — they are not human-written.
+The pipeline preserves the original `source_url` and `source_name` so
+every claim can be traced to its origin, and it never reproduces
+copyrighted text from the source.
+
 ## Usage
 
 ```bash
