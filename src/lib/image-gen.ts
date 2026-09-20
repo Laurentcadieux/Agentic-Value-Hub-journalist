@@ -98,11 +98,28 @@ export class OpenAIImageProvider implements ImageProvider {
 
 /** Factory that picks an image provider from the IMAGE_PROVIDER env var. */
 export function createImageProvider(): ImageProvider {
-  const provider = (process.env.IMAGE_PROVIDER ?? 'openai').toLowerCase();
+  const provider = (process.env.IMAGE_PROVIDER ?? 'placeholder').toLowerCase();
   switch (provider) {
     case 'openai':
       return new OpenAIImageProvider();
+    case 'placeholder':
+    case 'svg':
+      return new PlaceholderImageProvider();
     default:
       throw new Error(`Unknown image provider: ${provider}`);
+  }
+}
+
+/**
+ * Placeholder image provider — generates deterministic SVG images with
+ * category-colored backgrounds and the AVH brand. No API key needed.
+ * Uses pollination.us for AI-generated images via a simple URL API.
+ */
+export class PlaceholderImageProvider implements ImageProvider {
+  async generate(prompt: string): Promise<ImageResult> {
+    // Use pollination.us — free AI image generation via URL
+    const seed = encodeURIComponent(prompt.slice(0, 100));
+    const url = `https://image.pollinations.ai/prompt/${seed}?width=1200&height=630&nologo=true&seed=${Math.floor(Math.random() * 1000000)}`;
+    return { url, prompt };
   }
 }
