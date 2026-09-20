@@ -15,6 +15,11 @@
     "agent:industry": "tsx src/index.ts --agent industry",
     "agent:integration": "tsx src/index.ts --agent integration",
     "agent:market-pulse": "tsx src/index.ts --agent market-pulse",
+    "agent:canada-focus": "tsx src/index.ts --agent canada-focus",
+    "agent:eu-focus": "tsx src/index.ts --agent eu-focus",
+    "agent:security": "tsx src/index.ts --agent security",
+    "agent:governance-policy": "tsx src/index.ts --agent governance-policy",
+    "agent:us-focus": "tsx src/index.ts --agent us-focus",
     "schedule": "tsx src/scheduler.ts",
     "build": "tsc",
     "dev": "tsx watch src/index.ts"

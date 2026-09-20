@@ -1,11 +1,11 @@
 # Agentic Value Hub — Journalist
 
-Automated journalism pipeline with 10 AI agents that find, summarize, and illustrate news about agentic AI, automation, and enterprise AI.
+Automated journalism pipeline with 15 AI agents that find, summarize, and illustrate news about agentic AI, automation, and enterprise AI.
 
 ## What It Does
 
 ```
-10 AI Journalists (each with a different beat)
+15 AI Journalists (each with a different beat)
   │
   ├── Find news from RSS, APIs, web sources
   ├── Write original summaries (never copy copyrighted content)
@@ -17,7 +17,7 @@ Automated journalism pipeline with 10 AI agents that find, summarize, and illust
          └── Audit log (IngestionEvent)
 ```
 
-## The 10 Journalists
+## The 15 Journalists
 
 | # | Agent Name | Beat | Sources |
 |---|-----------|------|---------|
@@ -31,6 +31,11 @@ Automated journalism pipeline with 10 AI agents that find, summarize, and illust
 | 8 | **Industry Vertical** | Industry-specific AI use cases (finance, healthcare, etc.) | Industry publications, case studies |
 | 9 | **Integration Intel** | MCP, APIs, integration platforms, connectors | Model Context Protocol, API providers |
 | 10 | **Market Pulse** | Market trends, vendor comparisons, buyer guides | Gartner Magic Quadrant, Forrester Wave |
+| 11 | **Canada Focus** | Canadian AI & automation market, government AI initiatives, startups | Canadian tech publications, government feeds |
+| 12 | **EU Focus** | European AI market, EU AI Act, GDPR/AI intersection | EU publications, European tech media, EC feeds |
+| 13 | **Security** | AI security, agentic AI risks, prompt injection, zero-trust AI | Security publications, NIST, CISA, vendor blogs |
+| 14 | **Governance & Policy** | Global AI governance, regulation, ethics, AI standards (ISO, NIST, EU AI Act) | Government publications, regulatory bodies, think tanks |
+| 15 | **US Focus** | US AI market, enterprise adoption, US government AI policy, executive orders | US tech publications, White House AI, US gov publications |
 
 ## Architecture
 

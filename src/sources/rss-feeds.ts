@@ -1,0 +1,132 @@
+/**
+ * RSS feed definitions per agent.
+ *
+ * Each agent covers a different beat, so each gets a focused set of
+ * 3-5 RSS feeds relevant to that beat. Feeds are grouped by agent id
+ * and re-exported through the AgentConfig in config/agents.ts.
+ */
+export type AgentId =
+  | 'enterprise-ai'
+  | 'agentic-scout'
+  | 'automation'
+  | 'boat'
+  | 'investment'
+  | 'research'
+  | 'governance'
+  | 'industry'
+  | 'integration'
+  | 'market-pulse'
+  | 'canada-focus'
+  | 'eu-focus'
+  | 'security'
+  | 'governance-policy'
+  | 'us-focus';
+
+export interface FeedDefinition {
+  name: string;
+  url: string;
+}
+
+/** RSS feeds keyed by agent id. */
+export const RSS_FEEDS: Record<AgentId, FeedDefinition[]> = {
+  'enterprise-ai': [
+    { name: 'Gartner AI Feed', url: 'https://www.gartner.com/en/newsroom/rss' },
+    { name: 'Forrester Blogs', url: 'https://feeds.feedburner.com/forrester/BVqV' },
+    { name: 'VentureBeat AI', url: 'https://venturebeat.com/category/ai/feed/' },
+    { name: 'The Verge AI', url: 'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml' },
+  ],
+  'agentic-scout': [
+    { name: 'OpenAI Blog', url: 'https://openai.com/blog/rss.xml' },
+    { name: 'Anthropic News', url: 'https://www.anthropic.com/news/rss.xml' },
+    { name: 'LangChain Blog', url: 'https://blog.langchain.dev/rss/' },
+    { name: 'CrewAI Blog', url: 'https://www.crewai.com/blog/rss.xml' },
+    { name: 'AutoGPT News', url: 'https://autogpt.net/feed/' },
+  ],
+  automation: [
+    { name: 'UiPath News', url: 'https://www.uipath.com/news/rss' },
+    { name: 'Automation Anywhere', url: 'https://www.automationanywhere.com/rss/press-releases.xml' },
+    { name: 'Blue Prism Newsroom', url: 'https://www.blueprism.com/news/feed/' },
+    { name: 'Zapier Blog', url: 'https://zapier.com/blog/feeds/latest/' },
+    { name: 'Workato Blog', url: 'https://www.workato.com/feeds/blog.rss' },
+  ],
+  boat: [
+    { name: 'Forrester Automation', url: 'https://feeds.feedburner.com/forrester/BVqV' },
+    { name: 'Gartner Process Mining', url: 'https://www.gartner.com/en/newsroom/rss' },
+    { name: 'Celonis Blog', url: 'https://www.celonis.com/blog/rss/' },
+    { name: 'Signavio Blog', url: 'https://www.signavio.com/feed/' },
+  ],
+  investment: [
+    { name: 'TechCrunch', url: 'https://techcrunch.com/feed/' },
+    { name: 'Crunchbase News', url: 'https://news.crunchbase.com/feed/' },
+    { name: 'VentureBeat Funding', url: 'https://venturebeat.com/category/funding/feed/' },
+    { name: 'PitchBook News', url: 'https://pitchbook.com/news/rss' },
+    { name: 'StrictlyVC', url: 'https://strictlyvc.com/feed/' },
+  ],
+  research: [
+    { name: 'arXiv cs.AI', url: 'http://export.arxiv.org/rss/cs.AI' },
+    { name: 'arXiv cs.CL', url: 'http://export.arxiv.org/rss/cs.CL' },
+    { name: 'arXiv cs.MA', url: 'http://export.arxiv.org/rss/cs.MA' },
+    { name: 'Google AI Blog', url: 'https://research.google/blog/rss/' },
+    { name: 'DeepMind Blog', url: 'https://deepmind.google/blog/rss.xml' },
+  ],
+  governance: [
+    { name: 'NIST AI', url: 'https://www.nist.gov/news-feeds/artificial-intelligence' },
+    { name: 'EU Digital Strategy', url: 'https://digital-strategy.ec.europa.eu/en/rss-feeds' },
+    { name: 'ICO AI Regulation', url: 'https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/rss/' },
+    { name: 'AI Now Institute', url: 'https://ainowinstitute.org/feed/' },
+  ],
+  industry: [
+    { name: 'AI in Healthcare', url: 'https://aithority.com/category/healthcare/feed/' },
+    { name: 'Fintech AI', url: 'https://aithority.com/category/finance/feed/' },
+    { name: 'Enterprise Times AI', url: 'https://www.enterprisetimes.co.uk/category/technology/ai/feed/' },
+    { name: 'AI Business', url: 'https://aibusiness.com/feed/' },
+  ],
+  integration: [
+    { name: 'Anthropic MCP', url: 'https://www.anthropic.com/news/rss.xml' },
+    { name: 'MCP Server Registry', url: 'https://modelcontextprotocol.io/rss.xml' },
+    { name: 'Zapier Engineering', url: 'https://zapier.com/blog/feeds/engineering/' },
+    { name: 'Workato Integrations', url: 'https://www.workato.com/feeds/blog.rss' },
+    { name: 'Make.com Blog', url: 'https://www.make.com/en/blog/rss' },
+  ],
+  'market-pulse': [
+    { name: 'Gartner Magic Quadrant', url: 'https://www.gartner.com/en/newsroom/rss' },
+    { name: 'Forrester Wave', url: 'https://feeds.feedburner.com/forrester/BVqV' },
+    { name: 'IDC Markets', url: 'https://www.idc.com/newsroom/rss' },
+    { name: 'G2 Blog', url: 'https://www.g2.com/blog/rss' },
+  ],
+  'canada-focus': [
+    { name: 'BetaKit', url: 'https://betakit.com/feed/' },
+    { name: 'The Logic', url: 'https://thelogic.co/feed/' },
+    { name: 'Government of Canada AI', url: 'https://www.canada.ca/en/news/rss' },
+    { name: 'Canadian Government Digital News', url: 'https://www.canada.ca/en/innovation-science-economic-development/news.rss' },
+    { name: 'IT World Canada', url: 'https://www.itworldcanada.com/feed/' },
+  ],
+  'eu-focus': [
+    { name: 'EU Digital Strategy', url: 'https://digital-strategy.ec.europa.eu/en/rss-feeds' },
+    { name: 'European Commission News', url: 'https://ec.europa.eu/commission/presscorner/api/rss' },
+    { name: 'EU AI Watch', url: 'https://digital-strategy.ec.europa.eu/en/rss-feeds/ai-watch' },
+    { name: 'EURACTIV Digital', url: 'https://www.euractiv.com/section/digital/feed/' },
+    { name: 'Science Business', url: 'https://sciencebusiness.net/feed' },
+  ],
+  security: [
+    { name: 'CISA Cybersecurity', url: 'https://www.cisa.gov/news.xml' },
+    { name: 'NIST Cybersecurity', url: 'https://www.nist.gov/news-feeds/cybersecurity' },
+    { name: 'Krebs on Security', url: 'https://krebsonsecurity.com/feed/' },
+    { name: 'Schneier on Security', url: 'https://www.schneier.com/feed/' },
+    { name: 'Dark Reading', url: 'https://www.darkreading.com/rss.xml' },
+  ],
+  'governance-policy': [
+    { name: 'OECD AI Policy', url: 'https://oecd.ai/rss' },
+    { name: 'ISO News', url: 'https://www.iso.org/rss.xml' },
+    { name: 'Partnership on AI', url: 'https://partnershiponai.org/feed/' },
+    { name: 'AI Ethics Lab', url: 'https://aiethicslab.com/feed/' },
+    { name: 'Brookings AI', url: 'https://www.brookings.edu/topic/artificial-intelligence/feed/' },
+  ],
+  'us-focus': [
+    { name: 'White House AI', url: 'https://www.whitehouse.gov/feed/' },
+    { name: 'NITRD AI', url: 'https://www.nitrd.gov/rss' },
+    { name: 'FedScoop AI', url: 'https://fedscoop.com/feeds/all/' },
+    { name: 'Nextgov AI', url: 'https://www.nextgov.com/rss/' },
+    { name: 'US AI Initiative', url: 'https://www.ai.gov/feed/' },
+  ],
+};
