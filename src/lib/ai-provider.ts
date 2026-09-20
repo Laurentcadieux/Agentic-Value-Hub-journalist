@@ -101,11 +101,18 @@ export class OpenAIProvider implements AiProvider {
 
   async summarize(title: string, content: string): Promise<string> {
     const system =
-      'You are an enterprise-AI journalist. Write a 2-3 paragraph ORIGINAL summary of the article below. ' +
-      'Do NOT copy sentences from the source. Write in clear, neutral, professional prose.';
+      'You are a WIRED magazine journalist. Write a 2-3 paragraph ORIGINAL summary of the article below. ' +
+      'Punchy, confident, tech-forward. Hook the reader in the first sentence. No corporate speak. No filler. ' +
+      'Every word earns its place. Do NOT copy sentences from the source. Write in clear, conversational, ' +
+      'authoritative prose. The first sentence must pull the reader in.';
     const user = `TITLE: ${title}\n\nCONTENT:\n${content.slice(0, 8000)}`;
     return this.chat(system, user).then((s) => s.trim());
   }
+
+  /** WIRED voice directive prepended to the default analyze() system prompt. */
+  private static readonly WIRED_VOICE =
+    'Write like a WIRED magazine journalist. Punchy, confident, tech-forward. ' +
+    'Hook the reader in the first sentence. No corporate speak. No filler. Every word earns its place.';
 
   async analyze(
     title: string,
@@ -114,9 +121,12 @@ export class OpenAIProvider implements AiProvider {
     options: AnalyzeOptions = {},
   ): Promise<AnalyzeResult> {
     // System prompt is sourced from the shared format guide so every
-    // agent writes to the same editorial standard (ethics + format +
-    // beat context). Callers may override via options.systemPrompt.
-    const system = options.systemPrompt ?? formatArticlePrompt(defaults.beat);
+    // agent writes to the same WIRED-inspired editorial standard
+    // (ethics + format + beat context). The WIRED voice directive is
+    // prepended here so the voice is enforced at the provider level too.
+    // Callers may override the whole prompt via options.systemPrompt.
+    const baseSystem = options.systemPrompt ?? formatArticlePrompt(defaults.beat);
+    const system = options.systemPrompt ? baseSystem : `${OpenAIProvider.WIRED_VOICE}\n\n${baseSystem}`;
     const user = `BEAT: ${defaults.beat}\nDEFAULT CATEGORIES: ${JSON.stringify(defaults.categories)}\nDEFAULT TAGS: ${JSON.stringify(defaults.tags)}\n\nTITLE: ${title}\n\nCONTENT:\n${content.slice(0, 8000)}`;
     const raw = await this.chat(system, user, true);
     return this.parseAnalyze(raw, defaults, title);

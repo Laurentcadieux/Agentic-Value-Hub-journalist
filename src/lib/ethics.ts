@@ -26,6 +26,7 @@ export const ETHICAL_RULES: readonly string[] = [
   'Never fabricate quotes, statistics, or facts.',
   'Clearly label assumptions, estimates, and uncertain data as such.',
   'No clickbait headlines — headlines must be factual and clear.',
+  'Headlines must be punchy and engaging but factually accurate. No clickbait that misrepresents the content. WIRED-style means engaging, not misleading.',
   'No fear-mongering or sensationalized alarmist language.',
   'Respect copyright — summarize and analyze, never reproduce protected text.',
   'Disclose that the article is AI-generated / AI-assisted.',

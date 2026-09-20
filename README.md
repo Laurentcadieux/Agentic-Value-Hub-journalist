@@ -109,16 +109,21 @@ Each agent produces:
 }
 ```
 
-## Editorial Standards
+## Editorial Voice: WIRED-inspired
 
 Every article produced by every one of the 15 journalists is held to the
 same editorial standard, enforced by the shared format guide
-(`src/lib/format-guide.ts`) and the ethics validator
-(`src/lib/ethics.ts`).
+(`src/lib/format-guide.ts`) and the ethics validator (`src/lib/ethics.ts`).
+
+The pipeline writes in a **WIRED-inspired voice**: punchy, tech-forward,
+confident, conversational but authoritative. Every piece blends news and
+analysis the way WIRED does — *here's what happened, here's what matters,
+here's why you should care.* The angle is always clear. The hook is always
+first.
 
 ### Ethical guidelines
 
-All 15 agents follow these 10 rules, embedded in the AI system prompt and
+All 15 agents follow these rules, embedded in the AI system prompt and
 checked at process time:
 
 1. **Never copy source text verbatim** — always rewrite in original prose.
@@ -126,16 +131,60 @@ checked at process time:
 3. **Never fabricate quotes, statistics, or facts.**
 4. **Clearly label assumptions, estimates, and uncertain data** as such.
 5. **No clickbait headlines** — headlines must be factual and clear.
-6. **No fear-mongering** or sensationalized alarmist language.
-7. **Respect copyright** — summarize and analyze, never reproduce protected text.
-8. **Disclose that the article is AI-generated / AI-assisted.**
-9. **No fake news** — every claim must trace back to the cited source.
-10. **Maintain a neutral, professional tone**; avoid editorializing or hype.
+6. **Headlines must be punchy and engaging but factually accurate.** No
+   clickbait that misrepresents the content. WIRED-style means engaging,
+   not misleading.
+7. **No fear-mongering** or sensationalized alarmist language.
+8. **Respect copyright** — summarize and analyze, never reproduce protected text.
+9. **Disclose that the article is AI-generated / AI-assisted.**
+10. **No fake news** — every claim must trace back to the cited source.
+11. **Maintain a neutral, professional tone**; avoid editorializing or hype.
 
 After AI processing, each article is run through `validateEthics()`. If it
 violates the rules, the model is re-prompted once with the specific
 violations. If it still fails, the article is **skipped and logged** — a
 bad article never reaches publication.
+
+### The hook-first principle
+
+The first sentence of every `summary` is a **hook** — it pulls the reader
+in and makes them want the next sentence. WIRED openings don't start with
+"Today, Company X announced...". They start with the stake, the tension,
+or the surprising truth.
+
+| Weak (no hook) | WIRED-style (hook first) |
+|----------------|--------------------------|
+| "OpenAI has announced a new API for agents." | "Every AI agent you build is about to get a lot more hands." |
+| "A new report shows AI adoption is increasing." | "The companies winning at AI aren't the ones with the best models. They're the ones who stopped waiting for perfect." |
+
+### Good vs. bad headlines
+
+| ❌ Bad (corporate, flat) | ✅ Good (WIRED-style) |
+|--------------------------|----------------------|
+| "Analysis of AI Email Automation Trends" | "The AI Agent Revolution Is Coming for Your Inbox" |
+| "Vendor Announces New Automation Platform" | "This Startup Wants to Automate the Boring Half of Your Job" |
+| "Study Examines Enterprise AI Adoption Rates" | "Half of Enterprises Now Run AI in Production. The Other Half Are Falling Behind." |
+
+Good headlines use **active verbs**, name the stake, and read like
+something a person would say. They're punchy and engaging — but never
+misrepresent the story. No clickbait, no hype that the article can't back
+up.
+
+### The Problem-Use-Outcome principle
+
+Every article must implicitly answer three questions:
+
+- **What's broken?** — the pain point or gap the news addresses.
+- **What's the fix?** — the use case, who would use this and for what.
+- **What do you get?** — the tangible outcome, the concrete result it
+  enables.
+
+This keeps every article grounded in real-world value rather than
+abstract description.
+
+The `why_it_matters` field enforces a complementary rule — it must answer
+**"What should an enterprise leader DO with this information?"** — so every
+article ends on an actionable takeaway, not a vague observation.
 
 ### Article format
 
@@ -143,29 +192,24 @@ Every article follows this exact structure with hard character limits:
 
 | Field          | Length              | Contents                                                                 |
 |----------------|---------------------|--------------------------------------------------------------------------|
-| `headline`     | max 120 chars       | Clear, factual, no clickbait.                                            |
-| `summary`      | max 500 chars total | 2-3 short paragraphs. What happened, then why it matters.                |
-| `analysis`     | max 1000 chars      | 1-2 paragraphs on business implications for enterprise automation leaders. |
-| `why_it_matters` | max 300 chars     | 1-2 sentences. A concrete takeaway, not vague.                           |
+| `headline`     | max 120 chars       | Punchy, tech-forward, conversational. Active verbs. No corporate speak. |
+| `summary`      | max 500 chars total | 2-3 short paragraphs (WIRED "nut graf"). First sentence = hook. Then what happened. Then why it matters. |
+| `analysis`     | max 1000 chars      | 1-2 paragraphs. Authoritative but accessible. Connect to the bigger enterprise-AI picture. Concrete examples. |
+| `why_it_matters` | max 300 chars     | 1-2 sentences. A direct, tangible takeaway. What should a leader DO? |
 
-The article keeps it **short yet meaningful** — no filler, no fluff, every
-sentence adds value.
+### Example article (enterprise AI beat)
 
-### The Problem-Use-Outcome principle
+```json
+{
+  "headline": "AI Agents Are Quietly Taking Over Enterprise Support",
+  "summary": "The boring truth about AI agents: they're not replacing workers. They're handling the 80% of support tickets nobody wants to touch.\n\nCompanies deploying agentic AI for customer support report 40-60% reduction in tier-1 ticket volume.\n\nThat's not a headline-grabbing layoff story. It's a quiet reassignment of grunt work — and it's reshaping how support teams hire.",
+  "analysis": "Companies deploying agentic AI for customer support report 40-60% reduction in tier-1 ticket volume. The agents handle password resets, status checks, and simple refunds — the grunt work that burns out human agents.\n\nThe pattern repeats across the enterprise: AI takes the high-volume, low-judgment work, and humans handle the escalations that actually need judgment. Support teams stop hiring for ticket throughput and start hiring for problem-solving.",
+  "why_it_matters": "If you run a support team over 20 people, pilot agentic AI on your lowest-complexity tickets this quarter. The ROI is measurable within 90 days."
+}
+```
 
-The `summary` must implicitly answer three questions:
-
-- **What problem exists?** — the pain point or gap the news addresses.
-- **What is the use case?** — who would use this and for what.
-- **What is the tangible outcome?** — the concrete result or change it
-  enables.
-
-This keeps summaries grounded in real-world value rather than abstract
-description.
-
-The `why_it_matters` field enforces a complementary rule — it must answer
-**"What should an enterprise leader DO with this information?"** — so every
-article ends on an actionable takeaway.
+See `src/lib/wired-examples.ts` for full examples across three beats
+(enterprise AI, security, governance).
 
 ### Readability rules
 
@@ -177,6 +221,8 @@ Applied to every field of every article:
 - End with an actionable takeaway the reader can act on.
 - One idea per paragraph. No walls of text.
 - Plain English. No marketing language, no hype words, no buzzword salad.
+- Conversational, not academic. Write like a smart friend explaining the news, not a press release.
+- Confident, not hedging. Make the claim. Skip "it could be argued" and "some say".
 
 ### AI disclosure policy
 
