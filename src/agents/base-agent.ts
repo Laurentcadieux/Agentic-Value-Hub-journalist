@@ -6,17 +6,21 @@
  * article never kills the whole run.
  */
 import { Logger } from '../lib/logger.js';
-import { ingestFromFeeds } from '../pipeline/ingest.js';
+import { ingestForAgent } from '../pipeline/ingest.js';
 import { processArticles } from '../pipeline/process.js';
 import { illustrateArticles } from '../pipeline/illustrate.js';
 import { publishArticles } from '../pipeline/publish.js';
-import type { AgentConfig } from '../types.js';
+import type { AgentConfig, RawArticle } from '../types.js';
 
 export interface BaseAgentRunOptions {
   /** If true, process + illustrate but skip the actual POST. */
   dryRun?: boolean;
   /** Max raw items to take from ingest. */
   maxItems?: number;
+  /** Backfill mode: fetch more items per feed, skip age filtering. */
+  backfill?: boolean;
+  /** Only process articles published on/after this date (YYYY-MM-DD or ISO). */
+  since?: string;
 }
 
 export interface BaseAgentRunResult {
@@ -44,15 +48,15 @@ export class BaseJournalist {
     const dryRun = options.dryRun ?? false;
     this.log.info('agent run starting', { agent: this.config.name, dryRun });
 
-    // 1. Ingest — build feed defs from the config's RSS URLs.
-    const feeds = this.config.rssFeeds.map((url) => ({
-      name: this.config.name,
-      url,
-    }));
-
-    let raws: Awaited<ReturnType<typeof ingestFromFeeds>>;
+    // 1. Ingest — fetch from all configured source types (rss + youtube + web).
+    let raws: RawArticle[];
     try {
-      raws = await ingestFromFeeds(feeds, { maxItems: options.maxItems ?? 20, logger: this.log });
+      raws = await ingestForAgent(this.config, {
+        maxItems: options.maxItems ?? 20,
+        backfill: options.backfill,
+        since: options.since,
+        logger: this.log,
+      });
     } catch (err) {
       this.log.error('ingest stage failed', { error: err instanceof Error ? err.message : String(err) });
       return { ingested: 0, processed: 0, illustrated: 0, published: 0, duplicate: 0, failed: 0 };

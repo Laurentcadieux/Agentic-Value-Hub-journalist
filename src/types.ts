@@ -9,7 +9,7 @@
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /** Type of source a journalist can pull from. */
-export type SourceType = 'rss' | 'api' | 'web';
+export type SourceType = 'rss' | 'api' | 'web' | 'youtube';
 
 /** Configuration for a single content source. */
 export interface SourceConfig {
@@ -27,8 +27,10 @@ export interface RawArticle {
   title: string;
   /** Canonical/original article URL. */
   link: string;
-  /** Publication date as reported by the feed (RFC-822/ISO string). */
+  /** Publication date as reported by the source (RFC-822/ISO string). */
   pubDate: string;
+  /** Original publication date in ISO 8601 (preserved from source, never overwritten). */
+  publishedAt: string;
   /** Raw HTML or text content from the feed entry. */
   content: string;
   /** Publisher/source name (e.g. "TechCrunch"). */
@@ -66,6 +68,8 @@ export interface ProcessedArticle extends RawArticle {
   technologies: string[];
   /** SHA-256 content fingerprint (headline|summary|sourceUrl). */
   contentHash: string;
+  /** When the agent processed this article (ISO 8601, set at process time). */
+  processedAt: string;
   /** Generated image URL, set after the illustrate step. */
   imageUrl?: string;
 }
@@ -131,6 +135,8 @@ export interface AgentConfig {
   schedule: string;
   /** RSS feed URLs the agent subscribes to. */
   rssFeeds: string[];
+  /** YouTube channel IDs (UC...) the agent monitors for new uploads. */
+  youtubeChannels: string[];
   /** Default categories assigned to this agent's articles. */
   categories: string[];
   /** Default tags assigned to this agent's articles. */

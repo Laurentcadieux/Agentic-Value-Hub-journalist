@@ -41,6 +41,7 @@ export async function processArticle(
   const headline = analyzed.headline || raw.title;
   const summary = analyzed.summary;
   const hash = contentHash(headline, summary, raw.link);
+  const processedAt = new Date().toISOString();
 
   return {
     ...raw,
@@ -55,6 +56,7 @@ export async function processArticle(
     businessFunctions: analyzed.business_functions,
     technologies: analyzed.technologies,
     contentHash: hash,
+    processedAt,
   };
 }
 
@@ -73,7 +75,14 @@ export async function processArticles(
     try {
       const processed = await processArticle(raw, config, { ai, logger: log });
       out.push(processed);
-      log.info('processed', { headline: processed.headline, hash: processed.contentHash });
+      const sourceDate = processed.publishedAt.slice(0, 10);
+      const processedDate = processed.processedAt.slice(0, 10);
+      log.info('processed', {
+        headline: processed.headline,
+        hash: processed.contentHash,
+        sourceDate,
+        processedDate,
+      });
     } catch (err) {
       log.error('process failed', { link: raw.link, error: err instanceof Error ? err.message : String(err) });
     }

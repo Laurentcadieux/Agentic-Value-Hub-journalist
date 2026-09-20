@@ -118,6 +118,7 @@ npm install
 # Configure
 cp .env.example .env
 # Set: AVH_API_URL, AVH_API_KEY, AI_API_KEY, IMAGE_API_KEY
+# Optional: YOUTUBE_API_KEY, SCRAPE_USER_AGENT
 
 # Run all agents
 npm run start
@@ -128,7 +129,35 @@ npm run agent:agentic-scout
 
 # Run on schedule (cron)
 npm run schedule
+
+# Historical backfill — fetch older articles (last 50 per feed, not last 10)
+npx tsx src/index.ts --backfill
+npx tsx src/index.ts --agent agentic-scout --backfill --dry-run
+
+# Only process articles published since a date
+npx tsx src/index.ts --since 2026-01-01
+npx tsx src/index.ts --agent research --backfill --since 2026-06-01
 ```
+
+### Source Types
+
+Each journalist pulls from three source types:
+
+1. **RSS feeds** — primary source. Each agent has 3-5 relevant feeds (see `src/sources/rss-feeds.ts`).
+2. **YouTube channels** — monitored via each channel's public RSS feed (no API key required). New uploads are fetched with their transcript as article content. Set `YOUTUBE_API_KEY` for richer metadata only if desired.
+3. **Web scraping** — when an RSS item's content is too short to summarize, the scraper fetches the full article from the URL (via cheerio) and extracts main text, title, author, publish date (including JSON-LD `datePublished`), and images.
+
+### Historical Backfilling
+
+The pipeline preserves the **original publication date** from the source — never the moment the agent ran — so historical content can be backfilled with correct dates:
+
+- `published_at` in the POST payload is the source's date (RSS `pubDate`, scraped `datePublished`, or YouTube `publishedAt`).
+- Each `ProcessedArticle` carries both `publishedAt` (original source date) and `processedAt` (when the agent ran).
+- Logs show both dates: `sourceDate: 2026-06-15 | processedDate: 2026-09-20`.
+- `--backfill` fetches more items per feed (last 50 instead of last 10) and processes articles regardless of age.
+- `--since YYYY-MM-DD` filters to articles published on/after that date.
+
+This lets you run the agents today and ingest articles from months ago, building a comprehensive archive with the correct historical dates.
 
 ## Integration with AVH
 

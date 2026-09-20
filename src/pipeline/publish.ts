@@ -30,7 +30,7 @@ export function toNewsItem(article: ProcessedArticle): NewsItem {
     why_it_matters: article.whyItMatters,
     source_name: article.sourceName,
     source_url: normalizeUrl(article.link),
-    published_at: article.pubDate,
+    published_at: article.publishedAt || article.pubDate,
     categories: article.categories,
     tags: article.tags,
     companies: article.companies,

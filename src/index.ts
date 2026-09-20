@@ -13,21 +13,28 @@ import { Logger } from './lib/logger.js';
 
 const log = new Logger('cli');
 
-function parseArgs(argv: string[]): { agent?: string; all: boolean; dryRun: boolean } {
-  const out: { agent?: string; all: boolean; dryRun: boolean } = { all: false, dryRun: false };
+function parseArgs(argv: string[]): { agent?: string; all: boolean; dryRun: boolean; backfill: boolean; since?: string } {
+  const out: { agent?: string; all: boolean; dryRun: boolean; backfill: boolean; since?: string } = {
+    all: false,
+    dryRun: false,
+    backfill: false,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--agent' || a === '-a') out.agent = argv[++i];
     else if (a === '--all') out.all = true;
     else if (a === '--dry-run') out.dryRun = true;
+    else if (a === '--backfill') out.backfill = true;
+    else if (a === '--since') out.since = argv[++i];
     else if (a?.startsWith('--agent=')) out.agent = a.slice('--agent='.length);
+    else if (a?.startsWith('--since=')) out.since = a.slice('--since='.length);
   }
   return out;
 }
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  log.info('starting', { agent: args.agent ?? 'all', dryRun: args.dryRun });
+  log.info('starting', { agent: args.agent ?? 'all', dryRun: args.dryRun, backfill: args.backfill, since: args.since });
 
   if (args.agent) {
     const entry = getAgent(args.agent);
@@ -36,7 +43,7 @@ async function main(): Promise<void> {
       log.info('available agents', { agents: AGENT_INSTANCES.map((a) => a.config.id) });
       process.exit(1);
     }
-    const result = await entry.instance.run({ dryRun: args.dryRun });
+    const result = await entry.instance.run({ dryRun: args.dryRun, backfill: args.backfill, since: args.since });
     log.info('agent finished', { agent: entry.config.id, result });
     return;
   }
@@ -45,7 +52,7 @@ async function main(): Promise<void> {
   for (const entry of AGENT_INSTANCES) {
     try {
       log.info('running agent', { agent: entry.config.id, name: entry.config.name });
-      const result = await entry.instance.run({ dryRun: args.dryRun });
+      const result = await entry.instance.run({ dryRun: args.dryRun, backfill: args.backfill, since: args.since });
       log.info('agent done', { agent: entry.config.id, result });
     } catch (err) {
       log.error('agent crashed', {
