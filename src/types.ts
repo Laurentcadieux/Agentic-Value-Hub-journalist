@@ -57,6 +57,20 @@ export interface ProcessedArticle extends RawArticle {
   analysis: string;
   /** 1-2 sentences on why this matters now. */
   whyItMatters: string;
+  /** Deck / kicker displayed under the headline (WIRED-style). */
+  subtitle: string;
+  /** Closing section that wraps up the article. */
+  conclusion: string;
+  /** Scannable bullet points (3-5) summarizing the article. */
+  keyTakeaways: string[];
+  /** Notable quotes to highlight (1-3). Original or attributed, never fabricated. */
+  pullQuotes: string[];
+  /** Journalist / agent display name (set in the process stage). */
+  author: string;
+  /** Estimated read time in minutes (words / 200, rounded up, min 1). */
+  readingTimeMinutes: number;
+  /** Homepage hero placement flag. Defaults to false. */
+  isFeatured: boolean;
   /** Classiﬁed categories (e.g. ["Agentic AI"]). */
   categories: string[];
   /** Classiﬁed tags (e.g. ["agents","framework"]). */
@@ -92,6 +106,24 @@ export interface NewsItem {
   summary: string;
   analysis: string;
   why_it_matters: string;
+  /** Deck / kicker under the headline. */
+  subtitle: string;
+  /** Closing section. */
+  conclusion: string;
+  /** Scannable bullet points. */
+  keyTakeaways: string[];
+  /** Notable quotes to highlight. */
+  pullQuotes: string[];
+  /** Journalist / agent display name. */
+  author: string;
+  /** Estimated read time in minutes. */
+  readingTimeMinutes: number;
+  /** CTA button text (optional). */
+  ctaLabel?: string;
+  /** CTA button URL (optional). */
+  ctaUrl?: string;
+  /** Homepage hero placement flag. */
+  isFeatured: boolean;
   source_name: string;
   source_url: string;
   published_at: string;

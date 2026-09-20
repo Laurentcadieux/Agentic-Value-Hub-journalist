@@ -19,6 +19,14 @@ export interface AnalyzeResult {
   summary: string;
   analysis: string;
   why_it_matters: string;
+  /** Deck / kicker under the headline (WIRED-style). */
+  subtitle: string;
+  /** Closing section. */
+  conclusion: string;
+  /** Scannable bullet points (3-5). */
+  keyTakeaways: string[];
+  /** Notable quotes to highlight (1-3). */
+  pullQuotes: string[];
   categories: string[];
   tags: string[];
   companies: string[];
@@ -164,6 +172,10 @@ export class OpenAIProvider implements AiProvider {
         summary: String(parsed.summary ?? ''),
         analysis: String(parsed.analysis ?? ''),
         why_it_matters: String(parsed.why_it_matters ?? ''),
+        subtitle: String(parsed.subtitle ?? ''),
+        conclusion: String(parsed.conclusion ?? ''),
+        keyTakeaways: Array.isArray(parsed.keyTakeaways) ? parsed.keyTakeaways.map(String) : [],
+        pullQuotes: Array.isArray(parsed.pullQuotes) ? parsed.pullQuotes.map(String) : [],
         categories: Array.isArray(parsed.categories) ? parsed.categories.map(String) : [...defaults.categories],
         tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [...defaults.tags],
         companies: Array.isArray(parsed.companies) ? parsed.companies.map(String) : [],
@@ -179,6 +191,10 @@ export class OpenAIProvider implements AiProvider {
         summary: '',
         analysis: '',
         why_it_matters: '',
+        subtitle: '',
+        conclusion: '',
+        keyTakeaways: [],
+        pullQuotes: [],
         categories: [...defaults.categories],
         tags: [...defaults.tags],
         companies: [],

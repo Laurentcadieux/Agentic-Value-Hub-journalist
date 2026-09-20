@@ -81,7 +81,12 @@ export class AvhApiClient {
 
   /**
    * POST a NewsItem to the AVH /api/v1/news ingestion endpoint.
-   * On a 409 conflict, reports `duplicate: true`.
+   * The payload now carries the new presentation fields alongside the
+   * core article fields: subtitle, conclusion, keyTakeaways, pullQuotes,
+   * author (agent display name), readingTimeMinutes, isFeatured, plus the
+   * optional ctaLabel / ctaUrl. These are populated by the pipeline
+   * (see `src/pipeline/process.ts`) and serialized verbatim into the POST
+   * body. On a 409 conflict, reports `duplicate: true`.
    */
   async ingestNews(article: NewsItem): Promise<IngestResult> {
     const url = `${this.baseUrl}/api/v1/news`;

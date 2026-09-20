@@ -108,12 +108,33 @@ export async function processArticle(
   const hash = contentHash(headline, summary, raw.link);
   const processedAt = new Date().toISOString();
 
+  // Estimated reading time: count words across the generated article body
+  // (headline, subtitle, summary, analysis, why_it_matters, conclusion,
+  // keyTakeaways, pullQuotes) and divide by 200 wpm, rounded up, min 1.
+  const readingTimeMinutes = computeReadingTime([
+    headline,
+    analyzed.subtitle,
+    summary,
+    analyzed.analysis,
+    analyzed.why_it_matters,
+    analyzed.conclusion,
+    ...analyzed.keyTakeaways,
+    ...analyzed.pullQuotes,
+  ]);
+
   return {
     ...raw,
     headline,
     summary,
     analysis: analyzed.analysis,
     whyItMatters: analyzed.why_it_matters,
+    subtitle: analyzed.subtitle,
+    conclusion: analyzed.conclusion,
+    keyTakeaways: analyzed.keyTakeaways,
+    pullQuotes: analyzed.pullQuotes,
+    author: config.name,
+    readingTimeMinutes,
+    isFeatured: false,
     categories,
     tags,
     companies: analyzed.companies,
@@ -123,6 +144,16 @@ export async function processArticle(
     contentHash: hash,
     processedAt,
   };
+}
+
+/** Count words across the given text fields and return ceil(words/200), min 1. */
+function computeReadingTime(parts: string[]): number {
+  const words = parts
+    .filter(Boolean)
+    .join(' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
 }
 
 /**

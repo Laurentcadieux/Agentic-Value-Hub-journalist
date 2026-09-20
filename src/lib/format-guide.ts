@@ -52,6 +52,18 @@ could be argued that..." — just say it.
 4. why_it_matters — 1-2 sentences, max ${FORMAT_LIMITS.why_it_matters} characters.
    End with a tangible takeaway. What should a leader DO? Be direct: "If you're
    evaluating automation platforms, add this to your shortlist."
+5. subtitle — A short deck / kicker under the headline. One line, max 120
+   characters. Sets up the headline, never just restates it. WIRED-style.
+6. keyTakeaways — 3 to 5 scannable bullet points. Each bullet is ONE short
+   sentence (<= 20 words) capturing a single insight. No filler. A reader who
+   only skims these should understand the story.
+7. conclusion — 1-2 short paragraphs, max 500 characters. Closing section.
+   Wrap up the story and point forward. No restating the summary. End with the
+   "so what" for enterprise leaders.
+8. pullQuotes — 1 to 3 notable quotes to highlight. These MUST be real quotes
+   that appear in (or are directly paraphrased from) the source. NEVER fabricate
+   a quote. If no quotable line exists in the source, return an empty array.
+   Each quote is a single string, max 280 characters.
 
 PROBLEM-USE-OUTCOME: Every article must implicitly answer: What's broken?
 What's the fix? What do you get?
@@ -102,7 +114,10 @@ export function formatArticlePrompt(agentBeat: string): string {
     ...READABILITY_RULES.map((r) => `- ${r}`),
     '',
     'OUTPUT: Return ONLY a JSON object with these exact keys:',
-    'headline, summary, analysis, why_it_matters, categories, tags, companies, industries, business_functions, technologies.',
+    'headline, summary, analysis, why_it_matters, subtitle, keyTakeaways, conclusion, pullQuotes, categories, tags, companies, industries, business_functions, technologies.',
+    'subtitle is a one-line deck (max 120 chars). keyTakeaways is an array of 3-5 short bullet strings.',
+    'conclusion is a 1-2 paragraph closing string (max 500 chars). pullQuotes is an array of 1-3 real quote',
+    'strings from the source (empty array if none — NEVER fabricate quotes).',
     'categories/tags are short lowercase strings. companies/industries/business_functions/technologies',
     'are arrays of proper nouns or canonical names (empty array if none).',
     'Respect every character limit above. Respond with JSON only, no prose.',
@@ -131,7 +146,8 @@ export function formatFixPrompt(agentBeat: string, violations: string[]): string
     ...READABILITY_RULES.map((r) => `- ${r}`),
     '',
     'OUTPUT: Return ONLY the corrected JSON object with the same keys',
-    '(headline, summary, analysis, why_it_matters, categories, tags, companies, industries, business_functions, technologies).',
+    '(headline, summary, analysis, why_it_matters, subtitle, keyTakeaways, conclusion, pullQuotes, categories, tags, companies, industries, business_functions, technologies).',
+    'pullQuotes must be REAL quotes from the source — never fabricate. Return an empty array if none.',
     'Respond with JSON only, no prose.',
   ].join('\n');
 }
